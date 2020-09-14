@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Aux from '../../hoc/Auxiliary';
 import Burger from '../../components/Burger/Burger';
+import Modal from '../../components/UI/Modal/Modal';
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 
 const INGREDIENT_PRICES = {
@@ -24,7 +26,8 @@ class BurgerBuilder extends Component{
             cheese: 0,
             meat: 0
         },
-        totalPrice: 4
+        totalPrice: 4,
+        purchasing: false
     }
     clickHandlerLess = (type) => {
         const ingredientsCopy = {...this.state.ingredients};
@@ -46,21 +49,23 @@ class BurgerBuilder extends Component{
             totalPrice: this.state.totalPrice + priceAddition
         });
     }
+
+    openOrderSummary = () => {
+        this.setState({purchasing: true});
+    };
+
+    closeModalHandler = () =>{
+        this.setState({purchasing: false});
+    }
     render() {
         const disabledInfo = {...this.state.ingredients};
-        /*{
-            salad: 0,
-            bacon: 0,
-            cheese: 0,
-            meat: 0
-        }*/
-        Object.keys(disabledInfo).map(() =>{
-
-        });
+        
         return (
             <Aux>
+                <Modal show = {this.state.purchasing} closeModalHandler = {this.closeModalHandler}><OrderSummary ingredients = {this.state.ingredients}/></Modal>
                 <Burger ingredients = {this.state.ingredients}/>
-                <BuildControls disabledInfo = {disabledInfo} clickHandlerLess = {this.clickHandlerLess} clickHandlerMore = { this.clickHandlerMore } price = {this.state.totalPrice} />
+                
+                <BuildControls openOrderSummary = {this.openOrderSummary} disabledInfo = {disabledInfo} clickHandlerLess = {this.clickHandlerLess} clickHandlerMore = { this.clickHandlerMore } price = {this.state.totalPrice} />
             </Aux>
         )
     }

@@ -9,7 +9,12 @@ const controls = [
 ]
 const buildControls = (props) =>{
 
-   
+    let isOrderBtnEnabled = false;
+    for(let val in props.disabledInfo){
+        if(props.disabledInfo[val]){
+            isOrderBtnEnabled = true;
+        }
+    }
     return (
         <div className = {classes.BuildControls}>
             <p>Burger price = <strong> {props.price.toFixed(2)} </strong> </p>
@@ -18,7 +23,7 @@ const buildControls = (props) =>{
             })
 
             }
-            <button className = {classes.OrderButton} disabled = {!isOrderBtnEnabled}>ORDER NOW</button>
+            <button className = {classes.OrderButton} disabled = {!isOrderBtnEnabled} onClick = {props.openOrderSummary}>ORDER NOW</button>
         </div>
     );
 }
