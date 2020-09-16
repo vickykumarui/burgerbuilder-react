@@ -1,22 +1,35 @@
-import React from 'react';
+import React, { Component } from 'react';
 import classes from './Modal.css';
-import Aux from '../../../hoc/Auxiliary';
+import Aux from '../../../hoc/Auxiliary/Auxiliary';
 import Backdrop from '../Backdrop/Backdrop';
 
-const modal = (props) => (
-    // <div className = {classes.Modal}
-    // style = {{
-    //     transform: props.show ? 'translateY(0)': 'translateY(-100vh)',
-    //     opacity: props.show ? '1':'0'
-    // }}>
-    //     {props.children}
-    // </div>
-    <Aux>
-    <Backdrop show = {props.show} closeModalHandler = {props.closeModalHandler}></Backdrop>
-    <div className = {`${classes.Modal} ${props.show ? classes.show : ''}`} >
-        {props.children}
-    </div>
-    </Aux>
-)
+class Modal extends Component {
 
-export default modal;
+    shouldComponentUpdate(nextProps, nextState){
+            return nextProps.show !== this.props.show;
+    }
+   componentDidUpdate(){
+       console.log('componentDidUpdate Modal');
+   }
+
+    render(){
+        return (
+            // <div className = {classes.Modal}
+            // style = {{
+            //     transform: props.show ? 'translateY(0)': 'translateY(-100vh)',
+            //     opacity: props.show ? '1':'0'
+            // }}>
+            //     {props.children}
+            // </div>
+            <Aux>
+            <Backdrop show = {this.props.show} closeModalHandler = {this.props.closeModalHandler}></Backdrop>
+            <div className = {`${classes.Modal} ${this.props.show ? classes.show : ''}`} >
+                {this.props.children}
+            </div>
+            </Aux>
+        )
+    }
+
+} 
+
+export default Modal;
