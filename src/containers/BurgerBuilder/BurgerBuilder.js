@@ -4,6 +4,8 @@ import Burger from '../../components/Burger/Burger';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
+import axiosInstance from '../../axios-order';
+import Spinner from '../../components/UI/Spinner/Spinner';
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
@@ -27,7 +29,8 @@ class BurgerBuilder extends Component{
             meat: 0
         },
         totalPrice: 4,
-        purchasing: false
+        purchasing: false,
+        showSpinner: false
     }
     clickHandlerLess = (type) => {
         const ingredientsCopy = {...this.state.ingredients};
@@ -59,14 +62,44 @@ class BurgerBuilder extends Component{
     };
 
     continueHandler = () =>{
-        this.setState({purchasing: false});
+        // show spinner
+        this.setState({showSpinner: true});
+        // .json is required for firebase
+        const order = {
+            ingredients: this.state.ingredients,
+            price: this.state.totalPrice,
+            customer: {
+                name: 'Vicky kumar',
+                address: {
+                    street: 'Teststreet 1',
+                    zipCode: '121212',
+                    country: 'India'
+                },
+                email: 'test@test.com',
+                deliveryMethod: 'fastest'
+            }
+        };
+        
+        axiosInstance.post("/orders.json",order).then((res) =>{
+            // hide spinner
+            this.setState({showSpinner: false, purchasing: false});
+            console.log(res);
+        }).then((err) =>{
+             // hide spinner
+             this.setState({showSpinner: false, purchasing: false});
+            console.log(err);
+        });
+        
+        // this.setState({purchasing: false});
     };
     render() {
         const disabledInfo = {...this.state.ingredients};
         
         return (
             <Aux>
-                <Modal show = {this.state.purchasing} closeModalHandler = {this.closeModalHandler}><OrderSummary price = {this.state.totalPrice} closeModalHandler = {this.closeModalHandler} continueHandler = {this.continueHandler} ingredients = {this.state.ingredients}/></Modal>
+                <Modal show = {this.state.purchasing} closeModalHandler = {this.closeModalHandler}>
+                   {this.state.showSpinner ? <Spinner /> : <OrderSummary price = {this.state.totalPrice} closeModalHandler = {this.closeModalHandler} continueHandler = {this.continueHandler} ingredients = {this.state.ingredients}/>}
+                    </Modal>
                 <Burger ingredients = {this.state.ingredients}/>
                 
                 <BuildControls openOrderSummary = {this.openOrderSummary} disabledInfo = {disabledInfo} clickHandlerLess = {this.clickHandlerLess} clickHandlerMore = { this.clickHandlerMore } price = {this.state.totalPrice} />
