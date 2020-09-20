@@ -6,6 +6,7 @@ import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import axiosInstance from '../../axios-order';
 import Spinner from '../../components/UI/Spinner/Spinner';
+import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
@@ -22,15 +23,19 @@ class BurgerBuilder extends Component{
     // }
 
     state = {
-        ingredients: {
-            salad: 0,
-            bacon: 0,
-            cheese: 0,
-            meat: 0
-        },
+        ingredients:  null,
         totalPrice: 4,
         purchasing: false,
         showSpinner: false
+    }
+
+    componentDidMount(){
+        // componentDidMount will be called when all child component is loaded
+        axiosInstance.get("/ingredients.json").then((res) =>{
+            this.setState({ingredients: res.data});
+        }).catch((err) =>{
+            console.log(err);
+        });
     }
     clickHandlerLess = (type) => {
         const ingredientsCopy = {...this.state.ingredients};
@@ -62,6 +67,7 @@ class BurgerBuilder extends Component{
     };
 
     continueHandler = () =>{
+        console.log("continue handler called");
         // show spinner
         this.setState({showSpinner: true});
         // .json is required for firebase
@@ -84,7 +90,7 @@ class BurgerBuilder extends Component{
             // hide spinner
             this.setState({showSpinner: false, purchasing: false});
             console.log(res);
-        }).then((err) =>{
+        }).catch((err) =>{
              // hide spinner
              this.setState({showSpinner: false, purchasing: false});
             console.log(err);
@@ -98,9 +104,9 @@ class BurgerBuilder extends Component{
         return (
             <Aux>
                 <Modal show = {this.state.purchasing} closeModalHandler = {this.closeModalHandler}>
-                   {this.state.showSpinner ? <Spinner /> : <OrderSummary price = {this.state.totalPrice} closeModalHandler = {this.closeModalHandler} continueHandler = {this.continueHandler} ingredients = {this.state.ingredients}/>}
+                   {this.state.showSpinner ? <Spinner /> : this.state.ingredients ? <OrderSummary price = {this.state.totalPrice} closeModalHandler = {this.closeModalHandler} continueHandler = {this.continueHandler} ingredients = {this.state.ingredients}/> : null}
                     </Modal>
-                <Burger ingredients = {this.state.ingredients}/>
+                {this.state.ingredients ? <Burger ingredients = {this.state.ingredients}/> :   <Spinner />}
                 
                 <BuildControls openOrderSummary = {this.openOrderSummary} disabledInfo = {disabledInfo} clickHandlerLess = {this.clickHandlerLess} clickHandlerMore = { this.clickHandlerMore } price = {this.state.totalPrice} />
             </Aux>
@@ -108,4 +114,4 @@ class BurgerBuilder extends Component{
     }
 }
 
-export default BurgerBuilder;
+export default withErrorHandler(BurgerBuilder, axiosInstance);
