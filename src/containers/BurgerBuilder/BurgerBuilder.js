@@ -67,34 +67,17 @@ class BurgerBuilder extends Component{
     };
 
     continueHandler = () =>{
-        console.log("continue handler called");
-        // show spinner
-        this.setState({showSpinner: true});
-        // .json is required for firebase
-        const order = {
-            ingredients: this.state.ingredients,
-            price: this.state.totalPrice,
-            customer: {
-                name: 'Vicky kumar',
-                address: {
-                    street: 'Teststreet 1',
-                    zipCode: '121212',
-                    country: 'India'
-                },
-                email: 'test@test.com',
-                deliveryMethod: 'fastest'
-            }
-        };
-        
-        axiosInstance.post("/orders.json",order).then((res) =>{
-            // hide spinner
-            this.setState({showSpinner: false, purchasing: false});
-            console.log(res);
-        }).catch((err) =>{
-             // hide spinner
-             this.setState({showSpinner: false, purchasing: false});
-            console.log(err);
+        let queryParams = [];
+        for(let i in this.state.ingredients) {
+            queryParams.push(encodeURIComponent(i)+"="+ encodeURIComponent(this.state.ingredients[i]) ); 
+        }
+        queryParams.push("price="+this.state.totalPrice)
+        queryParams = queryParams.join('&');
+        this.props.history.push({
+            pathname: "/checkout",
+            search: "?"+queryParams
         });
+        
         
         // this.setState({purchasing: false});
     };
